@@ -48,12 +48,15 @@
   padding: 0;
 }
 
+html,
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .app-layout {
@@ -109,9 +112,10 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
+  width: 100%;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 821px) {
   .workspace-grid {
     grid-template-columns: 1fr 1fr;
     align-items: start;
@@ -673,4 +677,183 @@ body {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Mobile Responsiveness Rules (<= 820px and 360px widths) */
+@media (max-width: 820px) {
+  /* Layout & Card Spacing */
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .cover-letter-form,
+  .output-card {
+    padding: 1.15rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .letter-paper {
+    padding: 1.25rem 1rem;
+    min-height: 320px;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Form Elements: Full width, 16px font-size to prevent iOS auto-zoom */
+  .form-input,
+  .form-textarea {
+    width: 100% !important;
+    font-size: 16px !important;
+    box-sizing: border-box;
+  }
+
+  /* Buttons: Full width & minimum 44px touch target height */
+  .submit-btn {
+    width: 100% !important;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .reset-btn {
+    min-height: 44px;
+    min-width: 44px;
+    box-sizing: border-box;
+  }
+
+  .sample-btn {
+    min-height: 36px;
+  }
+
+  .action-icon-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .copy-btn {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Action buttons wrapping */
+  .output-card-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .output-card-header > .flex {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .output-card-header > .flex:last-child {
+    justify-content: flex-start;
+  }
+
+  .output-card-header > .flex:last-child .copy-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Form action buttons container wrapping */
+  .cover-letter-form .flex.items-center.space-x-3.mt-4 {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .cover-letter-form .flex.items-center.space-x-3.mt-4 > * + * {
+    margin-left: 0;
+  }
+
+  .cover-letter-form .reset-btn {
+    flex: 0 0 44px;
+  }
+
+  /* Resume Dropzone Wrapping */
+  .dropzone {
+    width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .attached-resume-card {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .attached-resume-card > .flex {
+    max-width: calc(100% - 40px);
+  }
+
+  /* Footer & Navigation Wrapping */
+  .app-header .max-w-7xl,
+  .output-card-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Extra small viewport constraint enforcement (360px width) */
+@media (max-width: 420px) {
+  body {
+    padding: 0;
+  }
+
+  main.max-w-7xl {
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  .cover-letter-form,
+  .output-card {
+    padding: 0.85rem;
+    border-radius: var(--radius-md);
+  }
+
+  .letter-paper {
+    padding: 1rem 0.75rem;
+  }
+
+  .cover-letter-content {
+    font-size: 0.925rem;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+
+  .form-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sample-btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  .ai-toggle-box {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .ai-toggle-label .flex.items-center.space-x-3 {
+    align-items: flex-start;
+  }
 }

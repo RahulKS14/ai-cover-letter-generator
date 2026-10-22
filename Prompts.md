@@ -1,25 +1,68 @@
-# AI Cover Letter Generator — Prompt Engineering Documentation
+# Prompts & Model Architecture Documentation
 
-This document describes the prompt architecture, system instructions, dynamic variable injection, and payload structuring used in the AI Cover Letter Generator powered by **Google Gemini 3.8 Flash**.
-
----
-
-## 1. Architecture Overview
-
-The application utilizes a two-stage prompt engineering pattern:
-1. **System Instruction**: Injects candidate persona, job parameters, tone, professional structural guidelines, and markdown output rules at the system level.
-2. **User Content Payload**: Supplies the candidate's core application intent and conditionally appends extracted PDF resume content as contextual reference material.
+This document records the exact tools, prompts, system instructions, variable injection logic, output processing, and security practices for the AI Cover Letter Generator.
 
 ---
 
-## 2. Dynamic System Instruction (`systemInstruction`)
+## 1. Tools Used
 
-The system prompt is injected dynamically per generation request on the server (`server/index.js`). Form variables (`candidateName`, `jobRole`, `targetCompany`, and `keySkills`) are interpolated into the system prompt to anchor the LLM's persona and context.
+- **AI Coding Agent**: Antigravity (Google DeepMind advanced agentic coding assistant)
+- **Gemini Model**: `gemini-3.8-flash` (called via `@google/genai` in `server/index.js`)
 
-### System Prompt Template
+---
+
+## 2. Prompts Given to the Coding Agent
+
+### Prompt 1: Initial Build Request
 
 ```text
-You are an elite executive career advisor and professional cover letter writer.
+Build an "AI Cover Letter Generator" with React (Vite) + Express.
+
+Frontend:
+- Form: Candidate Name, Job Role, Target Company, Key Skills (onChange state)
+- Phase 1: a function that interpolates the form state into a hardcoded
+  template string (no API), toggled by a "Use AI" checkbox
+- Output component with a working "Copy to Clipboard" button
+- "Generating..." loading state while waiting for the API
+- Resume upload (PDF, button + drag-drop)
+- Render LLM markdown as clean HTML <p> paragraphs, not one text block
+
+Backend (Express):
+- POST /api/generate -> calls Google Gemini API, injecting the form
+  variables into a system prompt
+- POST /api/parse-resume -> extracts PDF text with pdf-parse, and the
+  resume text is appended to the LLM payload
+
+Security (critical):
+- API key only in server-side .env as GEMINI_API_KEY (no VITE_ prefix)
+- Create .env.example and add .env to .gitignore BEFORE any git commit
+- Never print or commit the key
+
+Also create Prompts.md documenting the prompts used, and a README.
+```
+
+### Prompt 2: Mobile Responsiveness Request
+
+```text
+Make the app mobile responsive, quickly. CSS-only changes, don't touch the logic, don't refactor, don't add new features.
+
+- Ensure <meta name="viewport" content="width=device-width, initial-scale=1.0"> is in index.html
+- Below 820px, stack the form and the letter preview into one column
+- No horizontal scroll at 360px width
+- Inputs, textarea, and buttons full width, input font-size 16px, buttons min 44px tall
+- Action buttons (Copy, Download) and the resume dropzone should wrap on small screens
+
+Make the edits and stop. Skip extra testing and long explanations.
+```
+
+---
+
+## 3. System Prompt Sent to Gemini
+
+The following system prompt is sent as `config.systemInstruction` in `server/index.js`:
+
+```javascript
+`You are an elite executive career advisor and professional cover letter writer.
 Your objective is to craft a tailored, persuasive, and authentic cover letter for:
 - Candidate Name: ${candidateName.trim()}
 - Target Job Role: ${jobRole.trim()}
@@ -36,58 +79,75 @@ Writing Guidelines:
 3. Markdown output:
    - Output standard markdown paragraphs separated by double newlines.
    - You may use bold text for key achievements or company names where appropriate.
-   - Do NOT wrap the letter in markdown code blocks or backticks. Return the cover letter text directly.
+   - Do NOT wrap the letter in markdown code blocks or backticks. Return the cover letter text directly.`
 ```
 
 ---
 
-## 3. User Payload Structure
+## 4. Dynamic Variable Injection
 
-The user prompt contains the explicit task and incorporates resume text extracted via `pdf-parse` when a PDF has been uploaded by the candidate.
+When a user submits the form, the frontend sends a `POST /api/generate` request with:
+`{ candidateName, jobRole, targetCompany, keySkills, resumeText }`.
 
-### Case A: Without Resume Attached
+In `server/index.js`, variables are injected at two levels:
 
-```text
-Please write a customized, high-impact cover letter for Alex Morgan applying for the Senior Full Stack Engineer position at Vercel.
-Key skills to highlight: React, Next.js, TypeScript, Node.js, Distributed Systems, Performance Optimization, Developer Experience (DX)
-```
+1. **System Instruction**:
+   - `candidateName.trim()` -> Sets target candidate identity.
+   - `jobRole.trim()` -> Focuses role-specific framing.
+   - `targetCompany.trim()` -> Directs company alignment and salutation.
+   - `keySkills.trim()` -> Prioritizes core competencies to highlight.
 
-### Case B: With Extracted PDF Resume Attached
-
-```text
-Please write a customized, high-impact cover letter for Alex Morgan applying for the Senior Full Stack Engineer position at Vercel.
-Key skills to highlight: React, Next.js, TypeScript, Node.js, Distributed Systems, Performance Optimization, Developer Experience (DX)
-
-=== CANDIDATE RESUME / EXPERIENCE DETAILS ===
-[Extracted plain text from candidate's uploaded PDF resume via pdf-parse]
-=== END RESUME ===
-
-Please incorporate relevant highlights, accomplishments, and skills from the resume above to make this letter uniquely personalized and persuasive.
-```
-
----
-
-## 4. Phase 1 Local Fallback Template (Offline / No-API)
-
-When the **"Use AI"** checkbox is toggled off, the frontend runs Phase 1 client-side interpolation (`client/src/utils/templateGenerator.js`) with zero API dependency:
-
-```javascript
-/**
- * Hardcoded template string interpolation
- */
-export function generateTemplateCoverLetter({ candidateName, jobRole, targetCompany, keySkills, resumeText }) {
-  // Returns structured, formatted multi-paragraph cover letter
-}
-```
+2. **User Payload (`contents`)**:
+   - Primary instruction formulated with candidate, role, and company:
+     ```javascript
+     let userPrompt = `Please write a customized, high-impact cover letter for ${candidateName} applying for the ${jobRole} position at ${targetCompany}.`;
+     if (keySkills && keySkills.trim()) {
+       userPrompt += `\nKey skills to highlight: ${keySkills.trim()}`;
+     }
+     ```
+   - **Resume Text Appending**: When a user uploads a PDF resume, `POST /api/parse-resume` extracts its text via `pdf-parse`. If `resumeText` is present in the generate request, it is appended directly to the user prompt payload:
+     ```javascript
+     if (resumeText && resumeText.trim()) {
+       userPrompt += `\n\n=== CANDIDATE RESUME / EXPERIENCE DETAILS ===\n${resumeText.trim()}\n=== END RESUME ===\n\nPlease incorporate relevant highlights, accomplishments, and skills from the resume above to make this letter uniquely personalized and persuasive.`;
+     }
+     ```
 
 ---
 
-## 5. Output Formatting & Markdown-to-HTML Rules
+## 5. Output Handling
 
-To satisfy the requirement: *"Render LLM markdown as clean HTML `<p>` paragraphs, not one text block"*:
+Rather than rendering the model's markdown as an unformatted monospace wall of text, `client/src/components/MarkdownParagraphs.jsx` processes the string:
 
-1. **Paragraph Segmentation**: Output is split by `\n{2,}` (double newlines) into individual block elements.
-2. **Semantic Paragraphs**: Every regular text block is rendered as `<p className="cover-letter-paragraph">`.
-3. **Inline Formatting**: Inline markdown tokens like `**bold**` are converted to `<strong>` and `*italic*` to `<em>`.
-4. **Line Breaks**: Single newlines within a block (e.g., date or addresses) are rendered as `<br />`.
-5. **Headings & Lists**: Markdown headers (`#`, `##`, `###`) render as semantic headings, and bullet points (`* `, `- `) render as `<ul><li>` lists.
+1. **Paragraph Splitting**: Normalizes line breaks and splits text by double newlines (`normalized.split(/\n{2,}/)`).
+2. **Semantic Paragraphs (`<p>`)**: Wraps each text block in a dedicated `<p className="cover-letter-paragraph">` element with proper spacing and line height.
+3. **Headings & Bulleted Lists**: Blocks starting with `#` are rendered as headings (`<h4>`), and blocks matching list items are mapped into `<ul><li className="cover-letter-list-item">`.
+4. **Inline Markdown Parsing**:
+   - `**bold**` or `__bold__` is rendered as `<strong className="font-semibold">`.
+   - `*italic*` or `_italic_` is rendered as `<em className="italic">`.
+   - Single line breaks inside a block are rendered with `<br />`.
+
+---
+
+## 6. Iteration Log
+
+- **Initial Implementation**:
+  - Initialized project repository with `.gitignore` and `.env.example`.
+  - Created Express backend with `POST /api/generate` (`@google/genai` model `gemini-3.8-flash`) and `POST /api/parse-resume` (`pdf-parse`, `multer` memory storage).
+  - Built React (Vite) client featuring candidate form, Phase 1 offline template fallback, PDF drag-and-drop upload, loading skeleton, clipboard copy, and `<p>` markdown paragraph renderer.
+  - Resolved build error in `client/src/App.jsx` where non-existent icon export `Github` was imported from `lucide-react`.
+- **Iteration 1 (Mobile Responsiveness)**:
+  - Applied CSS-only mobile responsiveness in `client/src/index.css`.
+  - Added single-column layout switch below 820px (`@media (max-width: 820px)`).
+  - Ensured no horizontal scroll at 360px viewport width (`overflow-x: hidden`, adjusted paper/card padding, and word break).
+  - Made inputs, textarea, and submit buttons full width on mobile with `font-size: 16px` (preventing iOS auto-zoom) and minimum 44px button touch targets.
+  - Allowed action buttons (Copy, Download) and resume dropzone to wrap gracefully on narrow screens.
+
+---
+
+## 7. Security Notes
+
+- **Server-Side API Key Only**: `GEMINI_API_KEY` is loaded exclusively inside `server/index.js` via `process.env.GEMINI_API_KEY`.
+- **No `VITE_` Prefix**: The key is never prefixed with `VITE_`, preventing Vite from bundling it into the client application.
+- **Git Protection**: `.env` and `server/.env` were added to `.gitignore` before any git commit was made. `.env.example` is committed as a template without secret values.
+- **Browser Isolation**: The frontend issues requests to the local proxy endpoint `/api/generate`. The browser never interacts with the Google Gemini API directly and never receives or handles the API key.
+- **Zero Logging of Credentials**: Server logging statements and error responses explicitly avoid printing or returning the API key.
