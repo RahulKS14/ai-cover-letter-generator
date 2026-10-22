@@ -1,0 +1,13 @@
+{
+  "name": "ai-cover-letter-generator-workspace",
+  "version": "1.0.0",
+  "description": "Fullstack AI Cover Letter Generator built with React (Vite) and Express",
+  "scripts": {
+    "dev:server": "node server/index.js",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "node -e \"const { spawn } = require('child_process'); const s = spawn('node', ['server/index.js'], { stdio: 'inherit', shell: true }); const c = spawn('npm', ['--prefix', 'client', 'run', 'dev'], { stdio: 'inherit', shell: true }); process.on('SIGINT', () => { s.kill(); c.kill(); process.exit(); });\""
+  },
+  "keywords": ["ai", "cover-letter", "gemini", "react", "express"],
+  "author": "",
+  "license": "MIT"
+}
