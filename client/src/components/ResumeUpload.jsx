@@ -25,9 +25,9 @@ export default function ResumeUpload({
       return;
     }
 
-    // Limit to 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      setUploadError('PDF file size exceeds 10MB limit.');
+    // Limit to 4MB (Vercel serverless request body limit)
+    if (file.size > 4 * 1024 * 1024) {
+      setUploadError('PDF file size exceeds 4MB limit for serverless functions.');
       return;
     }
 
@@ -142,7 +142,7 @@ export default function ResumeUpload({
               <p className="text-sm font-medium mb-1">
                 <span className="text-accent hover:underline cursor-pointer">Click to browse</span> or drag & drop PDF
               </p>
-              <p className="text-xs text-muted">PDF files up to 10MB • Text extracted automatically</p>
+              <p className="text-xs text-muted">PDF files up to 4MB • Text extracted automatically</p>
             </div>
           )}
         </div>

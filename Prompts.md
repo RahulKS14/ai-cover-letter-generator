@@ -7,7 +7,7 @@ This document records the exact tools, prompts, system instructions, variable in
 ## 1. Tools Used
 
 - **AI Coding Agent**: Antigravity (Google DeepMind advanced agentic coding assistant)
-- **Gemini Model**: `gemini-3.8-flash` (called via `@google/genai` in `server/index.js`)
+- **Gemini Model**: `gemini-3.6-flash` (called via `@google/genai` in `server/index.js`)
 
 ---
 
@@ -132,7 +132,7 @@ Rather than rendering the model's markdown as an unformatted monospace wall of t
 
 - **Initial Implementation**:
   - Initialized project repository with `.gitignore` and `.env.example`.
-  - Created Express backend with `POST /api/generate` (`@google/genai` model `gemini-3.8-flash`) and `POST /api/parse-resume` (`pdf-parse`, `multer` memory storage).
+  - Created Express backend with `POST /api/generate` (`@google/genai` model `gemini-3.6-flash`) and `POST /api/parse-resume` (`pdf-parse`, `multer` memory storage).
   - Built React (Vite) client featuring candidate form, Phase 1 offline template fallback, PDF drag-and-drop upload, loading skeleton, clipboard copy, and `<p>` markdown paragraph renderer.
   - Resolved build error in `client/src/App.jsx` where non-existent icon export `Github` was imported from `lucide-react`.
 - **Iteration 1 (Mobile Responsiveness)**:

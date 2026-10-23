@@ -1,11 +1,11 @@
 # AI Cover Letter Generator ✉️✨
 
-A fullstack application built with **React (Vite)** and **Express** that generates highly tailored, professional cover letters using **Google Gemini 3.8 Flash** and client-side template interpolation.
+A fullstack application built with **React (Vite)** and **Express** that generates highly tailored, professional cover letters using **Google Gemini 3.6 Flash** and client-side template interpolation.
 
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react)
 ![Vite](https://img.shields.io/badge/Vite-6-646cff?logo=vite)
 ![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express)
-![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.8_Flash-8e75ff?logo=google)
+![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.6_Flash-8e75ff?logo=google)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
@@ -142,7 +142,7 @@ Open your browser at **`http://localhost:5173`**.
 ## 📡 API Endpoints
 
 ### 1. `POST /api/generate`
-Generates a customized cover letter using Gemini 3.8 Flash.
+Generates a customized cover letter using Gemini 3.6 Flash.
 
 - **Request Body (JSON):**
   ```json
@@ -185,10 +185,10 @@ Checks backend health and whether a valid `GEMINI_API_KEY` is detected.
 
 1. **Phase 1 (Instant Local Template)**:
    - Click **"Sample Data"** to autofill the form.
-   - Uncheck **"Use AI (Gemini 3.8 Flash)"**.
+   - Uncheck **"Use AI (Gemini 3.6 Flash)"**.
    - Click **"Generate Template Letter"** — the letter renders instantaneously without touching the API!
 2. **Phase 2 (Gemini AI Generation)**:
-   - Check **"Use AI (Gemini 3.8 Flash)"**.
+   - Check **"Use AI (Gemini 3.6 Flash)"**.
    - Click **"Generate with Gemini AI"** — view the "Generating..." loading animation and review the tailored cover letter.
 3. **Resume Integration**:
    - Drag and drop or browse any `.pdf` resume file.

@@ -7,7 +7,21 @@
     "dev:client": "npm --prefix client run dev",
     "dev": "node -e \"const { spawn } = require('child_process'); const s = spawn('node', ['server/index.js'], { stdio: 'inherit', shell: true }); const c = spawn('npm', ['--prefix', 'client', 'run', 'dev'], { stdio: 'inherit', shell: true }); process.on('SIGINT', () => { s.kill(); c.kill(); process.exit(); });\""
   },
-  "keywords": ["ai", "cover-letter", "gemini", "react", "express"],
+  "keywords": [
+    "ai",
+    "cover-letter",
+    "gemini",
+    "react",
+    "express"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^2.31.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "multer": "^2.5.0",
+    "pdf-parse": "^1.1.1"
+  }
 }
