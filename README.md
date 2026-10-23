@@ -8,6 +8,10 @@ A fullstack application built with **React (Vite)** and **Express** that generat
 ![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.6_Flash-8e75ff?logo=google)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## 🔗 Live Demo
+
+**[ai-cover-letter-generator-ten-psi.vercel.app](https://ai-cover-letter-generator-ten-psi.vercel.app/)**
+
 ---
 
 ## 🌟 Key Features
